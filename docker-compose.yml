@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 8080:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  weba:
+    build:
+      context: web/a
+    expose:
+      - 8081
+    environment:
+      - VIRTUAL_HOST=a.localhost
+    depends_on:
+      - nginx-proxy
+  webb:
+    build:
+      context: web/b
+    expose:
+      - 8082
+    environment:
+      - VIRTUAL_HOST=b.localhost
+    depends_on:
+      - nginx-proxy
+  webc:
+    build:
+      context: web/generic
+    expose:
+      - 8080
+    environment:
+      - VIRTUAL_HOST=c.localhost
+      - WEB_MESSAGE=Web C from generic
+      - WEB_NAME=D
+      - WEB_PORT=8080
+    depends_on:
+      - nginx-proxy
+  webd:
+    build:
+      context: web/generic
+    expose:
+      - 8080
+    environment:
+      - VIRTUAL_HOST=d.localhost
+      - WEB_MESSAGE=Web D from generic
+      - WEB_NAME=D
+      - WEB_PORT=8080
+    depends_on:
+      - nginx-proxy
